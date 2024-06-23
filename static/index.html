@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TheraTutor</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #F5FFFA;
+            color: #333333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 80px auto 50px auto;
+            padding: 20px;
+            background: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            background: #00796B;
+            padding: 10px 0;
+            text-align: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav a {
+            color: #FFFFFF;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: background 0.3s, transform 0.3s;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        nav a.active {
+            background: #004D40;
+            transform: scale(1.1);
+        }
+
+        nav a.help:after {
+            content: " ❤️";
+        }
+
+        footer {
+            background: #00796B;
+            color: #FFFFFF;
+            text-align: center;
+            padding: 10px 0;
+            margin-top: 50px;
+        }
+
+        h1 {
+            color: #00796B;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #004D40, #00251A);
+            color: #FFFFFF;
+            padding: 50px 20px;
+            text-align: center;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            color: #FFEB3B;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: #FFC107;
+            margin-bottom: 30px;
+        }
+
+        .hero button {
+            padding: 15px 30px;
+            border: none;
+            background: #4CAF50;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 18px;
+            transition: background 0.3s ease;
+        }
+
+        .hero button:hover {
+            background: #388E3C;
+        }
+
+        .topics {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+
+        .topic {
+            background: #F1F8E9;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 10px;
+            width: 300px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .topic h2 {
+            color: #00796B;
+        }
+
+        .topic img {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #616161;
+            margin-bottom: 20px;
+        }
+
+        #chat-box {
+            height: 300px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 20px;
+            background-color: #F1F8E9;
+            border-radius: 8px;
+        }
+
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .message.user {
+            text-align: right;
+            background-color: #FFCCBC;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+
+        .message.assistant {
+            text-align: left;
+            background-color: #CFD8DC;
+            align-self: flex-start;
+            margin-right: auto;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            background: #4CAF50;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #388E3C;
+        }
+
+        #loading {
+            display: none;
+            text-align: center;
+            color: #00796B;
+            margin-top: 10px;
+        }
+
+        .crisis {
+            color: #D32F2F;
+            font-weight: bold;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.3/socket.io.min.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+
+<body>
+    <nav>
+        <a href="#home" class="active">Home</a>
+        <a href="#chat">Chat</a>
+        <a href="#help" class="help">Help</a>
+    </nav>
+
+    <div class="container" id="home">
+        <div class="hero">
+            <h1>Welcome to TheraTutor</h1>
+            <p>Your one-stop solution for wellness and tutoring. We're here to support your mental health and academic journey.</p>
+            <button onclick="location.href='#chat'">Start Chatting</button>
+        </div>
+
+        <div class="topics">
+            <div class="topic">
+                <img src="mentalhealth.jpeg" alt="Mental Health">
+                <h2>Mental Health</h2>
+                <p>Explore resources and tips on managing stress, anxiety, and other mental health concerns.</p>
+            </div>
+            <div class="topic">
+                <img src="physicalwellness.jpeg" alt="Physical Wellness">
+                <h2>Physical Wellness</h2>
+                <p>Get advice on maintaining your physical health through exercise, diet, and healthy habits.</p>
+            </div>
+            <div class="topic">
+                <img src="mathematicstutoring.jpeg" alt="Mathematics Tutoring">
+                <h2>Mathematics Tutoring</h2>
+                <p>Find help with algebra, calculus, geometry, and more. Improve your math skills with guided lessons.</p>
+            </div>
+            <div class="topic">
+                <img src="sciencetutoring.jpeg" alt="Science Tutoring">
+                <h2>Science Tutoring</h2>
+                <p>Access resources and tutoring for physics, chemistry, biology, and other science subjects.</p>
+            </div>
+            <div class="topic">
+                <img src="studyingtips.jpeg" alt="Study Tips">
+                <h2>Study Tips</h2>
+                <p>Learn effective study techniques to enhance your learning experience and academic performance.</p>
+            </div>
+            <div class="topic">
+                <img src="examprep.jpeg" alt="Exam Preparation">
+                <h2>Exam Preparation</h2>
+                <p>Get strategies and materials for preparing for exams like SAT, ACT, GRE, and more.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="chat" style="display: none;">
+        <h1>TheraTutor Chat</h1>
+        <p>Welcome to TheraTutor Chat: Tutoring that adapts to your emotional needs.</p>
+        <div id="chat-box"></div>
+        <div id="loading">Thinking...</div>
+        <input type="text" id="message" placeholder="Type your message here...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <div class="container" id="help" style="display: none;">
+        <h1>Help Topics</h1>
+        <div class="topics">
+            <div class="topic">
+                <h2>General Questions</h2>
+                <p>Find answers to the most frequently asked questions about our services.</p>
+            </div>
+            <div class="topic">
+                <h2>Technical Support</h2>
+                <p>If you're experiencing technical issues, find troubleshooting steps and support options.</p>
+            </div>
+            <div class="topic">
+                <h2>Account Management</h2>
+                <p>Get help with account creation, password resets, and managing your profile.</p>
+            </div>
+            <div class="topic">
+                <h2>Contact Us</h2>
+                <p>If you need further assistance, feel free to reach out to our support team.</p>
+            </div>
+            <div class="topic">
+                <h2 class="crisis">Students in Crisis</h2>
+                <p>If you are in crisis, please know you are not alone. Help is available. Visit <a href="https://988lifeline.org/chat" target="_blank">988lifeline.org/chat</a> for immediate support from a compassionate counselor.</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        TheraTutor &copy; 2024 All rights reserved.
+    </footer>
+
+    <script>
+        var socket = io();
+
+        socket.on('message', function (msg) {
+            console.log("Received message:", msg);
+            var chatBox = document.getElementById('chat-box');
+            var messageElement = document.createElement('div');
+            messageElement.className = 'message assistant';
+            messageElement.innerHTML = msg;
+            chatBox.appendChild(messageElement);
+            console.log("Appended message:", messageElement.innerHTML);
+            MathJax.typeset();
+            chatBox.scrollTop = chatBox.scrollHeight;
+            document.getElementById('loading').style.display = 'none';
+        });
+
+        function sendMessage() {
+            var messageInput = document.getElementById('message');
+            var message = messageInput.value;
+            if (message.trim() === '') return;
+            var chatBox = document.getElementById('chat-box');
+            var messageElement = document.createElement('div');
+            messageElement.className = 'message user';
+            messageElement.innerHTML = message;
+            chatBox.appendChild(messageElement);
+            console.log("Sent message:", messageElement.innerHTML);
+            MathJax.typeset();
+            chatBox.scrollTop = chatBox.scrollHeight;
+            socket.send(message);
+            messageInput.value = '';
+            document.getElementById('loading').style.display = 'block';
+        }
+
+        document.getElementById('message').addEventListener('keypress', function (event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', function (event) {
+                document.querySelectorAll('.container').forEach(section => section.style.display = 'none');
+                document.querySelector(link.getAttribute('href')).style.display = 'block';
+                document.querySelectorAll('nav a').forEach(navLink => navLink.classList.remove('active'));
+                link.classList.add('active');
+            });
+        });
+
+        document.getElementById('home').style.display = 'block';
+    </script>
+
+</body>
+
+</html>
